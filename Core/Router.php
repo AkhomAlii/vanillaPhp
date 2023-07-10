@@ -5,6 +5,9 @@ namespace Core;
 
 
 use Core\Middlewares\Middleware;
+use function is_array;
+use const false;
+use const true;
 
 class Router {
 
@@ -50,49 +53,34 @@ class Router {
        return new static;
     }
 
-    public static function route(): void
+    public static function route()
     {
-        $method = $_POST['_method'] ?? false;
-        $middleware = $method ? self::setMiddleware($method) : self::setMiddleware(Request::method());
-        self::routeMiddleware($middleware, $method);
-    }
 
-    private static function setMiddleware($method)
-    {
-        return is_array(self::$routes[$method][Request::path()]) ?
-            self::$routes[$method][Request::path()][1] : false;
-    }
-
-    private static function routeMiddleware(mixed $middleware, mixed $method): void
-    {
-        $haveMethod = $_SERVER['REQUEST_METHOD'] === 'POST' && $method !== false;
-
-        if ($middleware) {
-
+        $method = Request::method();
+        $middleware = !is_array(Router::$routes[$method][Request::path()]) ?
+            false
+            : Router::$routes[$method][Request::path()][1];
+        if ($middleware){
             Middleware::resolve($middleware);
-            self::shit($haveMethod, $method, true);
-
         }
-        self::shit($haveMethod, $method);
+        return self::getRoute($method, $middleware);
+    }
 
+
+    private static function getRoute($method, $middleware = false)
+    {
+        return !isset(self::$routes[$method][Request::path()]) ? abort() : self::getAction($method, $middleware);
     }
 
 
 
 
-    private static function shit($haveMethod, $method, $middleware = false)
+    private static function getAction(mixed $method, $middleware = false)
     {
-        return isset(self::$routes[Request::method()][Request::path()])
-            ? (!$haveMethod ? ((self::getRoute(Request::method(), $middleware)))
-            : self::getRoute($method, $middleware)) : (!$haveMethod ? ((abort())) : self::getRoute($method, $middleware));
 
-    }
-
-
-    private static function getRoute(mixed $method, $middleware = false)
-    {
-        return $middleware ? require base_path('Http/controllers/' . self::$routes[$method][Request::path()][0])
-            : require base_path('Http/controllers/' . self::$routes[$method][Request::path()]);
+        return !$middleware ?
+            require base_path('Http/controllers/' . self::$routes[$method][Request::path()])
+            : require base_path('Http/controllers/' . self::$routes[$method][Request::path()][0]);
     }
 
 

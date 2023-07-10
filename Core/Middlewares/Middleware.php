@@ -1,6 +1,8 @@
 <?php
 
 namespace Core\Middlewares;
+use Core\Request;
+
 abstract class  Middleware
 {
     public const MAPPER =[
@@ -10,18 +12,17 @@ abstract class  Middleware
 
     public static function resolve($middleware)
     {
-        if (! $middleware){
-            return;
-        }
-
         $middleware = Middleware::MAPPER[$middleware] ?? false;
 
         if (! $middleware){
             return;
         }
-
         return (new $middleware)->handle();
     }
 
     abstract public function handle();
+
+
+
+
 }

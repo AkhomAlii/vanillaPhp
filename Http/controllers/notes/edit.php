@@ -15,7 +15,7 @@ $note = $pdo->query('select * from notes where id = :id', ['id' => $_GET['id']])
 
 authenticate($note['user_id'] === $_SESSION['user_id']);
 
-view('notes/edit.view.php', [
+return view('notes/edit.view.php', [
     'head' => 'Edit',
     'note' => $note
 ]);
