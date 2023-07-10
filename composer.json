@@ -1,0 +1,15 @@
+{
+    "name": "abdelrhmanalyabdelrh/vanilla-php",
+    "authors": [
+        {
+            "name": "Akhom Alii"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Core\\" : "Core/",
+            "Http\\" : "Http/"
+        }
+    }
+}
