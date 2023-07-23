@@ -16,6 +16,7 @@ require base_path('bootstrap.php');
 
 
 require base_path('routes.php');
+
 try {
 
     Router::route();

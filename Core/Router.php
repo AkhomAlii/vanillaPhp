@@ -5,21 +5,19 @@ namespace Core;
 
 
 use Core\Middlewares\Middleware;
-use function is_array;
-use const false;
-use const true;
 
 class Router {
 
-
-    private static $routes = [];
+    private static string $method;
+    public static array $routes = [];
 
     /***
-     * @param $uri
-     * Where you wanna go,
+     * @param $method
+     * Handled by the caller function
+     * @param $path
+     * Where do you wanna go,
      * @param $action
      * How much you wanna risk
-     * @return void
      *
      *
      */
@@ -31,24 +29,28 @@ class Router {
 
     public static function get($path, $action): static
     {
+        static::$method = 'GET';
        self::append('GET', $path, $action);
        return new static ;
     }
 
     public static function post($path, $action): static
     {
+        static::$method = 'POST';
         self::append('POST', $path, $action);
        return new static;
     }
 
     public static function delete($path, $action): static
     {
+        static::$method = 'DELETE';
         self::append('DELETE', $path, $action);
         return new static;
     }
 
     public static function patch($path, $action): static
     {
+        static::$method = 'PATCH';
         self::append('PATCH', $path, $action);
        return new static;
     }
@@ -63,6 +65,7 @@ class Router {
         if ($middleware){
             Middleware::resolve($middleware);
         }
+
         return self::getRoute($method, $middleware);
     }
 
@@ -89,12 +92,9 @@ class Router {
 
     public static function middleware( $middleware): void
     {
-        $method = array_key_last(self::$routes);
-        $path = array_key_last(self::$routes[array_key_last(self::$routes)]);
-
+        $path = array_key_last(self::$routes[self::$method]);
         // I know it sounds creepy but, it basically means:
-        // self::$routes['GET']['/'] = [$oldAction, $middleware]
-
-        self::$routes[$method][$path] = [self::$routes[$method][$path], $middleware];
+        // self::$routes['GET']['/'] = [$oldAction, $middleware] instead of "$oldAction"
+        self::$routes[self::$method][$path] = [self::$routes[self::$method][$path], $middleware];
     }
 }
